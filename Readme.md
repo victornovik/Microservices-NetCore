@@ -36,11 +36,3 @@ dotnet ef migrations add bids
 ```
 dotnet ef database update
 ```
-### Deploy
-```
-dotnet publish
-cd .\bin\Release\net8.0
-dotnet Api.dll 
-OR 
-.\Api.exe
-```
