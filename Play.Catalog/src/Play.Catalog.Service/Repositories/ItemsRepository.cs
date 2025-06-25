@@ -6,11 +6,16 @@ using Play.Catalog.Service.Entities;
 
 namespace Play.Catalog.Service.Repositories;
 
-public class ItemsRepository
+public class ItemsRepository : IItemsRepository
 {
     private const string collectionName = "items";
     private readonly IMongoCollection<Item> collection;
     private readonly FilterDefinitionBuilder<Item> filterBuilder = Builders<Item>.Filter;
+
+    public ItemsRepository(IMongoDatabase database)
+    {
+        collection = database.GetCollection<Item>(collectionName);
+    }
 
     static ItemsRepository()
     {
@@ -20,13 +25,6 @@ public class ItemsRepository
         // Save GUID and DateTimeOffset as string
         BsonSerializer.RegisterSerializer(new GuidSerializer(BsonType.String));
         BsonSerializer.RegisterSerializer(new DateTimeOffsetSerializer(BsonType.String));
-    }
-
-    public ItemsRepository()
-    {
-        var client = new MongoClient("mongodb://localhost:27017");
-        var database = client.GetDatabase("Catalog");
-        collection = database.GetCollection<Item>(collectionName);
     }
 
     public async Task<IReadOnlyCollection<Item>> GetAllAsync()

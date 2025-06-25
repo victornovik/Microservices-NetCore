@@ -1,9 +1,24 @@
+using MongoDB.Driver;
+using Play.Catalog.Service.Repositories;
+using Play.Catalog.Service.Settings;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
-builder.Services.AddControllers(options => options.SuppressAsyncSuffixInActionNames = false);
-builder.Services.AddSwaggerGen();
+var serviceSettings = builder.Configuration.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>();
+
+var services = builder.Services;
+services.AddSingleton(serviceProvider =>
+{
+    var mongoDbSettings = builder.Configuration.GetSection(nameof(MongoDbSettings)).Get<MongoDbSettings>();
+    var mongoClient = new MongoClient(mongoDbSettings.ConnectionString);
+    return mongoClient.GetDatabase(serviceSettings.ServiceName);
+});
+
+services.AddSingleton<IItemsRepository, ItemsRepository>();
+
+services.AddOpenApi();
+services.AddControllers(options => options.SuppressAsyncSuffixInActionNames = false);
+services.AddSwaggerGen();
 
 var app = builder.Build();
 
