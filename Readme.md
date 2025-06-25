@@ -5,20 +5,22 @@
 dotnet new list
 ```
 
-## Create ASP.NET Core project
+## Create project, build, run
 ```
 dotnet new webapi -n Play.Catalog.Service
 dotnet dev-certs https --trust
-```
 
-## Build project (Go to Play.Catalog\src\Play.Catalog.Service)
-```
 dotnet build
+
+dotnet run
 ```
 
-## Run project
+## MongoDB setup
 ```
-dotnet run
+dotnet add package MongoDB.Driver
+
+docker run -d --rm --name mongo -p 27017:27017 -v mongodbdata:/data/db mongo
+docker ps
 ```
 
 ### EF dependencies
