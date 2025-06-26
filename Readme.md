@@ -8,11 +8,26 @@ dotnet new list
 ## Create project, build, run
 ```
 dotnet new webapi -n Play.Catalog.Service
+dotnet new classlib -n Play.Common
+
 dotnet dev-certs https --trust
-
 dotnet build
-
 dotnet run
+```
+
+## Create NuGet package from Play.Common project
+```
+dotnet pack -o ..\..\..\packages
+```
+
+## Add local NuGet packages storage
+```
+dotnet nuget add source D:\dev\src\casal_microservices\packages -n PlayEconomy
+```
+
+## Add reference to Play.Common NuGet package
+```
+dotnet add package Play.Common
 ```
 
 ## MongoDB setup

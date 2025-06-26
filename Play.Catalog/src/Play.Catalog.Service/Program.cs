@@ -1,6 +1,5 @@
-using MongoDB.Driver;
 using Play.Catalog.Service.Entities;
-using Play.Catalog.Service.Repositories;
+using Play.Common.MongoDB;
 
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
@@ -14,7 +13,6 @@ services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();

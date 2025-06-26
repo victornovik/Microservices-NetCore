@@ -3,7 +3,6 @@ using Play.Catalog.Service.Entities;
 
 namespace Play.Catalog.Service;
 
-
 public static class Extensions
 {
     // Convert Repository item to DTO exposed outside

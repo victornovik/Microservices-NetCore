@@ -1,10 +1,7 @@
-﻿using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
-using MongoDB.Bson.Serialization.Serializers;
+﻿using System.Linq.Expressions;
 using MongoDB.Driver;
-using Play.Catalog.Service.Entities;
 
-namespace Play.Catalog.Service.Repositories;
+namespace Play.Common.MongoDB;
 
 public class MongoRepository<T> : IRepository<T> where T : IEntity
 {
@@ -21,9 +18,19 @@ public class MongoRepository<T> : IRepository<T> where T : IEntity
         return await collection.Find(filterBuilder.Empty).ToListAsync();
     }
 
+    public async Task<IReadOnlyCollection<T>> GetAllAsync(Expression<Func<T, bool>> filter)
+    {
+        return await collection.Find(filter).ToListAsync();
+    }
+
     public async Task<T> GetAsync(Guid id)
     {
         var filter = filterBuilder.Eq(e => e.Id, id);
+        return await collection.Find(filter).FirstOrDefaultAsync();
+    }
+
+    public async Task<T> GetAsync(Expression<Func<T, bool>> filter)
+    {
         return await collection.Find(filter).FirstOrDefaultAsync();
     }
 
