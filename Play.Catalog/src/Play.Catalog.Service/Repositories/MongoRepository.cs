@@ -16,16 +16,6 @@ public class MongoRepository<T> : IRepository<T> where T : IEntity
         collection = database.GetCollection<T>(collectionName);
     }
 
-    static MongoRepository()
-    {
-        // Needed for GUID serializing since MongoDB.Driver 3.x
-        //BsonSerializer.RegisterSerializer(new GuidSerializer(GuidRepresentation.Standard));
-
-        // Save GUID and DateTimeOffset as string
-        BsonSerializer.RegisterSerializer(new GuidSerializer(BsonType.String));
-        BsonSerializer.RegisterSerializer(new DateTimeOffsetSerializer(BsonType.String));
-    }
-
     public async Task<IReadOnlyCollection<T>> GetAllAsync()
     {
         return await collection.Find(filterBuilder.Empty).ToListAsync();
