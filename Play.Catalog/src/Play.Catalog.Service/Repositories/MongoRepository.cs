@@ -6,18 +6,17 @@ using Play.Catalog.Service.Entities;
 
 namespace Play.Catalog.Service.Repositories;
 
-public class ItemsRepository : IItemsRepository
+public class MongoRepository<T> : IRepository<T> where T : IEntity
 {
-    private const string collectionName = "items";
-    private readonly IMongoCollection<Item> collection;
-    private readonly FilterDefinitionBuilder<Item> filterBuilder = Builders<Item>.Filter;
+    private readonly IMongoCollection<T> collection;
+    private readonly FilterDefinitionBuilder<T> filterBuilder = Builders<T>.Filter;
 
-    public ItemsRepository(IMongoDatabase database)
+    public MongoRepository(IMongoDatabase database, string collectionName)
     {
-        collection = database.GetCollection<Item>(collectionName);
+        collection = database.GetCollection<T>(collectionName);
     }
 
-    static ItemsRepository()
+    static MongoRepository()
     {
         // Needed for GUID serializing since MongoDB.Driver 3.x
         //BsonSerializer.RegisterSerializer(new GuidSerializer(GuidRepresentation.Standard));
@@ -27,32 +26,32 @@ public class ItemsRepository : IItemsRepository
         BsonSerializer.RegisterSerializer(new DateTimeOffsetSerializer(BsonType.String));
     }
 
-    public async Task<IReadOnlyCollection<Item>> GetAllAsync()
+    public async Task<IReadOnlyCollection<T>> GetAllAsync()
     {
         return await collection.Find(filterBuilder.Empty).ToListAsync();
     }
 
-    public async Task<Item> GetAsync(Guid id)
+    public async Task<T> GetAsync(Guid id)
     {
         var filter = filterBuilder.Eq(e => e.Id, id);
         return await collection.Find(filter).FirstOrDefaultAsync();
     }
 
-    public async Task CreateAsync(Item item)
+    public async Task CreateAsync(T entity)
     {
-        if (item == null)
-            throw new ArgumentNullException(nameof(item));
+        if (entity == null)
+            throw new ArgumentNullException(nameof(entity));
 
-        await collection.InsertOneAsync(item);
+        await collection.InsertOneAsync(entity);
     }
 
-    public async Task UpdateAsync(Item item)
+    public async Task UpdateAsync(T entity)
     {
-        if (item == null)
-            throw new ArgumentNullException(nameof(item));
+        if (entity == null)
+            throw new ArgumentNullException(nameof(entity));
 
-        var filter = filterBuilder.Eq(e => e.Id, item.Id);
-        await collection.ReplaceOneAsync(filter, item);
+        var filter = filterBuilder.Eq(e => e.Id, entity.Id);
+        await collection.ReplaceOneAsync(filter, entity);
     }
 
     public async Task DeleteAsync(Guid id)

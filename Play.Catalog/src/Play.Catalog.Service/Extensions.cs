@@ -7,8 +7,8 @@ namespace Play.Catalog.Service;
 public static class Extensions
 {
     // Convert Repository item to DTO exposed outside
-    public static ItemDto AsDto(this Item item)
+    public static ItemDto AsDto(this Entity entity)
     {
-        return new ItemDto(item.Id, item.Name, item.Description, item.Price, item.CreatedDate);
+        return new ItemDto(entity.Id, entity.Name, entity.Description, entity.Price, entity.CreatedDate);
     }
 }

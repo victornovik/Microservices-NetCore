@@ -9,9 +9,9 @@ namespace Play.Catalog.Service.Controllers;
 [Route("items")]
 public class ItemsController : ControllerBase
 {
-    private readonly IItemsRepository repository;
+    private readonly IRepository<Entity> repository;
 
-    public ItemsController(IItemsRepository repository)
+    public ItemsController(IRepository<Entity> repository)
     {
         this.repository = repository;
     }
@@ -37,7 +37,7 @@ public class ItemsController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<ItemDto>> PostAsync(CreateItemDto dto)
     {
-        var item = new Item{Id = Guid.NewGuid(), Name = dto.Name, Description = dto.Description, Price = dto.Price, CreatedDate = DateTimeOffset.UtcNow};
+        var item = new Entity{Id = Guid.NewGuid(), Name = dto.Name, Description = dto.Description, Price = dto.Price, CreatedDate = DateTimeOffset.UtcNow};
         await repository.CreateAsync(item);
         return CreatedAtAction(nameof(GetByIdAsync), new { id = item.Id }, item);
     }
