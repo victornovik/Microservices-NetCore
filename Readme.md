@@ -33,9 +33,15 @@ dotnet add package Play.Common
 ## MongoDB setup
 ```
 dotnet add package MongoDB.Driver
+```
 
-docker run -d --rm --name mongo -p 27017:27017 -v mongodbdata:/data/db mongo
+## Docker
+```
 docker ps
+docker run -d --rm --name mongo -p 27017:27017 -v mongodbdata:/data/db mongo
+docker stop mongo
+
+docker-compose up -d
 ```
 
 ### EF dependencies
