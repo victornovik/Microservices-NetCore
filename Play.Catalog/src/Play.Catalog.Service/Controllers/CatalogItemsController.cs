@@ -7,13 +7,33 @@ namespace Play.Catalog.Service.Controllers;
 
 [ApiController]
 [Route("items")]
-public class ItemsController(IRepository<Entity> repository) : ControllerBase
+public class CatalogItemsController(IRepository<Entity> repository) : ControllerBase
 {
+    private static int requestCount;
+
     [HttpGet]
-    public async Task<IEnumerable<ItemDto>> GetAsync()
+    public async Task<ActionResult<IEnumerable<ItemDto>>> GetAsync()
     {
+        requestCount++;
+        Console.WriteLine($"Request {requestCount} starting...");
+        
+        if (requestCount < 3)
+        {
+            Console.WriteLine($"Request {requestCount} delaying...");
+            await Task.Delay(TimeSpan.FromSeconds(10));
+        }
+
+        if (requestCount < 5)
+        {
+            Console.WriteLine($"Request {requestCount} returning 500...");
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+
         var dtos = (await repository.GetAllAsync()).Select(item => item.AsDto());
-        return dtos;
+
+        Console.WriteLine($"Request {requestCount} returning 200...");
+
+        return Ok(dtos);
     }
 
     // GET /items/12345
@@ -23,7 +43,7 @@ public class ItemsController(IRepository<Entity> repository) : ControllerBase
         var item = await repository.GetAsync(id);
         if (item == null)
             return NotFound();
-        return item.AsDto();
+        return Ok(item.AsDto());
     }
 
     // POST /items

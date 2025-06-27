@@ -12,7 +12,7 @@ dotnet new classlib -n Play.Common
 
 dotnet dev-certs https --trust
 dotnet build
-dotnet run
+dotnet run --launch-profile https
 ```
 
 ## Create NuGet package from Play.Common project
@@ -30,9 +30,14 @@ dotnet nuget add source D:\dev\src\casal_microservices\packages -n PlayEconomy
 dotnet add package Play.Common
 ```
 
-## MongoDB setup
+## MongoDB
 ```
 dotnet add package MongoDB.Driver
+```
+
+## Polly
+```
+dotnet add package Microsoft.Extensions.Http.Polly
 ```
 
 ## Docker
