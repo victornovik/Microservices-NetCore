@@ -20,28 +20,13 @@ services
         retryCount: 5,
         sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))
                                                  + TimeSpan.FromMilliseconds(jitter.Next(10, 1000)),
-        onRetry: (outcome, timeSpan, retryAttempt) =>
-        {
-            services.BuildServiceProvider()
-                    .GetService<ILogger<CatalogClient>>()?
-                    .LogWarning($"Delaying for {timeSpan.TotalSeconds} seconds and retry #{retryAttempt}");
-        }
+        onRetry: (outcome, timeSpan, retryAttempt) => Console.WriteLine($"Delaying for {timeSpan.TotalSeconds} seconds")
     ))
     .AddTransientHttpErrorPolicy(policyBuilder => policyBuilder.Or<TimeoutRejectedException>().CircuitBreakerAsync(
         handledEventsAllowedBeforeBreaking:3, 
-        durationOfBreak: TimeSpan.FromSeconds(15),
-        onBreak:(outcome, timeSpan) =>
-        {
-            services.BuildServiceProvider()
-                .GetService<ILogger<CatalogClient>>()?
-                .LogWarning($"Opening the circuit for {timeSpan.TotalSeconds} seconds");
-        },
-        onReset: () =>
-        {
-            services.BuildServiceProvider()
-                .GetService<ILogger<CatalogClient>>()?
-                .LogWarning("Closing the circuit");
-        }
+        durationOfBreak: TimeSpan.FromSeconds(10),
+        onBreak:(outcome, timeSpan) => Console.WriteLine($"Opening the circuit for {timeSpan.TotalSeconds} seconds"),
+        onReset: () => Console.WriteLine("Closing the circuit")
     ))
     .AddPolicyHandler(Policy.TimeoutAsync<HttpResponseMessage>(1));
 
