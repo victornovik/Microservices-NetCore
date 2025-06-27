@@ -1,17 +1,18 @@
-using Play.Catalog.Service.Entities;
 using Play.Common.MongoDB;
+using Play.Inventory.Service.Entitites;
 
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
 
-services.AddMongo().AddMongoRepository<Entity>("catalog_items");
+services.AddMongo().AddMongoRepository<InventoryEntity>("inventory_items");
 
-services.AddControllers(options => options.SuppressAsyncSuffixInActionNames = false);
+services.AddControllers();
 services.AddOpenApi();
 services.AddSwaggerGen();
 
 var app = builder.Build();
 
+// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
@@ -20,7 +21,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseRouting();
-app.UseEndpoints(endpoints => endpoints.MapControllers());
+
+app.UseAuthorization();
+
+app.MapControllers();
 
 app.Run();

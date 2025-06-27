@@ -7,15 +7,8 @@ namespace Play.Catalog.Service.Controllers;
 
 [ApiController]
 [Route("items")]
-public class ItemsController : ControllerBase
+public class ItemsController(IRepository<Entity> repository) : ControllerBase
 {
-    private readonly IRepository<Entity> repository;
-
-    public ItemsController(IRepository<Entity> repository)
-    {
-        this.repository = repository;
-    }
-
     [HttpGet]
     public async Task<IEnumerable<ItemDto>> GetAsync()
     {
