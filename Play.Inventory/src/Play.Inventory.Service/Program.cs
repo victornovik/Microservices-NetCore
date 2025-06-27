@@ -9,6 +9,8 @@ var services = builder.Services;
 
 services.AddMongo().AddMongoRepository<InventoryEntity>("inventory_items");
 
+var jitter = new Random();
+
 services
     .AddHttpClient<CatalogClient>(client =>
     {
@@ -16,7 +18,8 @@ services
     })
     .AddTransientHttpErrorPolicy(policyBuilder => policyBuilder.Or<TimeoutRejectedException>().WaitAndRetryAsync(
         retryCount: 5,
-        sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
+        sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))
+                                                 + TimeSpan.FromMilliseconds(jitter.Next(10, 1000)),
         onRetry: (outcome, timeSpan, retryAttempt) =>
         {
             services.BuildServiceProvider()
