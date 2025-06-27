@@ -2,12 +2,13 @@
 using Play.Common;
 using Play.Inventory.Service.Dtos;
 using Play.Inventory.Service.Entitites;
+using Play.Inventory.Service.HttpClients;
 
 namespace Play.Inventory.Service.Controllers;
 
 [ApiController]
 [Route("items")]
-public class InventoryItemsController(IRepository<InventoryEntity> repository) : ControllerBase
+public class InventoryItemsController(IRepository<InventoryEntity> repository, CatalogClient catalogClient) : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<IEnumerable<InventoryItemDto>>> GetAsync(Guid userId)
@@ -15,9 +16,15 @@ public class InventoryItemsController(IRepository<InventoryEntity> repository) :
         if (userId == Guid.Empty)
             return BadRequest();
 
-        var items = (await repository.GetAllAsync(i => i.UserId == userId))
-            .Select(i => i.AsDto());
-        return Ok(items);
+        var catalogItems = await catalogClient.GetCatalogItemsAsync();
+        var inventoryItems = await repository.GetAllAsync(i => i.UserId == userId);
+        var inventoryItemDtos = inventoryItems.Select(ii =>
+        {
+            var catalogItem = catalogItems.Single(ci => ci.Id == ii.CatalogItemId);
+            return ii.AsDto(catalogItem.Name, catalogItem.Description);
+        });
+
+        return Ok(inventoryItemDtos);
     }
 
     [HttpPost]
