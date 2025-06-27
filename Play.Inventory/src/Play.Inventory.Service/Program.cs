@@ -27,6 +27,22 @@ services
                     .LogWarning($"Delaying for {timeSpan.TotalSeconds} seconds and retry #{retryAttempt}");
         }
     ))
+    .AddTransientHttpErrorPolicy(policyBuilder => policyBuilder.Or<TimeoutRejectedException>().CircuitBreakerAsync(
+        handledEventsAllowedBeforeBreaking:3, 
+        durationOfBreak: TimeSpan.FromSeconds(15),
+        onBreak:(outcome, timeSpan) =>
+        {
+            services.BuildServiceProvider()
+                .GetService<ILogger<CatalogClient>>()?
+                .LogWarning($"Opening the circuit for {timeSpan.TotalSeconds} seconds");
+        },
+        onReset: () =>
+        {
+            services.BuildServiceProvider()
+                .GetService<ILogger<CatalogClient>>()?
+                .LogWarning("Closing the circuit");
+        }
+    ))
     .AddPolicyHandler(Policy.TimeoutAsync<HttpResponseMessage>(1));
 
 services.AddControllers();
@@ -35,7 +51,6 @@ services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
