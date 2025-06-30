@@ -20,10 +20,11 @@ dotnet run --launch-profile https
 ## Create NuGet package from Play.Common project
 ```
 dotnet pack -o ..\..\..\packages
-```
 
-## Add local NuGet packages storage
-```
+# Repack new changes into the package and uplift the version
+dotnet pack -p:PackageVersion=1.0.1 -o ..\..\..\packages\
+
+# Add local NuGet packages storage
 dotnet nuget add source D:\dev\src\casal_microservices\packages -n PlayEconomy
 ```
 
