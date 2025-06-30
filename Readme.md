@@ -9,6 +9,8 @@ dotnet new list
 ```
 dotnet new webapi -n Play.Catalog.Service
 dotnet new classlib -n Play.Common
+dotnet new classlib -n Play.Catalog.Contracts
+dotnet add reference ..\Play.Catalog.Contracts\Play.Catalog.Contracts.csproj
 
 dotnet dev-certs https --trust
 dotnet build
@@ -39,6 +41,13 @@ dotnet add package MongoDB.Driver
 ```
 dotnet add package Microsoft.Extensions.Http.Polly
 ```
+
+## RabbitMQ
+```
+dotnet add package MassTransit.AspNetCore
+dotnet add package MassTransit.RabbitMQ
+```
+
 
 ## Docker
 ```
