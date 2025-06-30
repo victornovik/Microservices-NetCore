@@ -46,6 +46,7 @@ dotnet add package Microsoft.Extensions.Http.Polly
 ## RabbitMQ
 ```
 dotnet add package MassTransit.RabbitMQ
+docker pull rabbitmq:4.1.1-management
 ```
 
 ## Docker
