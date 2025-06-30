@@ -9,29 +9,10 @@ namespace Play.Catalog.Service.Controllers;
 [Route("items")]
 public class CatalogItemsController(IRepository<Entity> repository) : ControllerBase
 {
-    private static int requests;
-
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ItemDto>>> GetAsync()
     {
-        var curRequest = ++requests;
-        Console.WriteLine($"{DateTimeOffset.UtcNow}> Request {curRequest} starting");
-        
-        if (curRequest < 3)
-        {
-            Console.WriteLine($"{DateTimeOffset.UtcNow}> Request {curRequest} delaying");
-            await Task.Delay(TimeSpan.FromSeconds(10));
-        }
-
-        if (curRequest < 5)
-        {
-            Console.WriteLine($"{DateTimeOffset.UtcNow}> Request {curRequest} returning 500");
-            return StatusCode(StatusCodes.Status500InternalServerError);
-        }
-
         var dtos = (await repository.GetAllAsync()).Select(item => item.AsDto());
-
-        Console.WriteLine($"{DateTimeOffset.UtcNow}> Request {curRequest} returning 200");
 
         return Ok(dtos);
     }
