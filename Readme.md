@@ -47,6 +47,9 @@ dotnet add package Microsoft.Extensions.Http.Polly
 ```
 dotnet add package MassTransit.RabbitMQ
 docker pull rabbitmq:4.1.1-management
+
+# See messages in browser
+http://localhost:15672/#/exchanges
 ```
 
 ## Docker
