@@ -7,8 +7,6 @@ using Play.Common.Settings;
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
 
-var serviceSettings = builder.Configuration.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>();
-
 services.AddMongo().AddMongoRepository<Entity>("catalog_items");
 
 services.AddMassTransit(x =>
@@ -17,6 +15,8 @@ services.AddMassTransit(x =>
     {
         var rabbitMqSettings = builder.Configuration.GetSection(nameof(RabbitMQSettings)).Get<RabbitMQSettings>();
         configurator.Host(rabbitMqSettings?.Host);
+
+        var serviceSettings = builder.Configuration.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>();
         configurator.ConfigureEndpoints(context, new KebabCaseEndpointNameFormatter(serviceSettings?.ServiceName, false));
     });
 });
