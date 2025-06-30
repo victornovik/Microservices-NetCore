@@ -44,18 +44,16 @@ dotnet add package Microsoft.Extensions.Http.Polly
 
 ## RabbitMQ
 ```
-dotnet add package MassTransit.AspNetCore
 dotnet add package MassTransit.RabbitMQ
 ```
 
-
 ## Docker
 ```
+docker-compose up -d
+
 docker ps
 docker run -d --rm --name mongo -p 27017:27017 -v mongodbdata:/data/db mongo
 docker stop mongo
-
-docker-compose up -d
 ```
 
 ### EF dependencies
