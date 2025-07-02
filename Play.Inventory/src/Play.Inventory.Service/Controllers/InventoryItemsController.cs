@@ -8,7 +8,7 @@ namespace Play.Inventory.Service.Controllers;
 
 [ApiController]
 [Route("items")]
-public class InventoryItemsController(IRepository<InventoryEntity> repository, CatalogClient catalogClient) : ControllerBase
+public class InventoryItemsController(IRepository<InventoryEntity> inventoryRepository, IRepository<CatalogEntity> catalogRepository) : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<IEnumerable<InventoryItemDto>>> GetAsync(Guid userId)
@@ -16,9 +16,15 @@ public class InventoryItemsController(IRepository<InventoryEntity> repository, C
         if (userId == Guid.Empty)
             return BadRequest();
 
-        // We make a request to Play.Catalog.Service via REST
-        var catalogItems = await catalogClient.GetCatalogItemsAsync();
-        var inventoryItems = await repository.GetAllAsync(i => i.UserId == userId);
+        // REST request to fetch all catalog items from Play.Catalog.Service
+        // var catalogItems = await catalogClient.GetCatalogItemsAsync();
+
+        var inventoryItems = await inventoryRepository.GetAllAsync(ie => ie.UserId == userId);
+        var inventoryItemsIds = inventoryItems.Select(ie => ie.CatalogItemId);
+
+        // Local MongoDB request to fetch only those catalog items that belong to the user
+        var catalogItems = await catalogRepository.GetAllAsync(ce => inventoryItemsIds.Contains(ce.Id));
+        
         var inventoryItemDtos = inventoryItems.Select(ii =>
         {
             var catalogItem = catalogItems.Single(ci => ci.Id == ii.CatalogItemId);
@@ -31,16 +37,16 @@ public class InventoryItemsController(IRepository<InventoryEntity> repository, C
     [HttpPost]
     public async Task<ActionResult> PostAsync(GrantItemsDto dto)
     {
-        var item = await repository.GetAsync(i => i.UserId == dto.UserId && i.CatalogItemId == dto.CatalogItemId);
+        var item = await inventoryRepository.GetAsync(i => i.UserId == dto.UserId && i.CatalogItemId == dto.CatalogItemId);
         if (item == null)
         {
             item = new InventoryEntity { UserId = dto.UserId, CatalogItemId = dto.CatalogItemId, Quantity = dto.Quantity, AcquiredDate = DateTimeOffset.UtcNow };
-            await repository.CreateAsync(item);
+            await inventoryRepository.CreateAsync(item);
         }
         else
         {
             item.Quantity += dto.Quantity;
-            await repository.UpdateAsync(item);
+            await inventoryRepository.UpdateAsync(item);
         }
         return Ok();
     }

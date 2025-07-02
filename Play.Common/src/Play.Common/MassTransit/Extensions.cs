@@ -12,17 +12,21 @@ public static class Extensions
     {
         services.AddMassTransit(massTransitConfigurator =>
         {
+            // Register all MassTransit consumers inhereted from IConsumer<> found in the current assembly
             massTransitConfigurator.AddConsumers(Assembly.GetEntryAssembly());
 
             massTransitConfigurator.UsingRabbitMq((context, rabbitMQConfigurator) =>
             {
                 var cfg = context.GetService<IConfiguration>();
-
                 var rabbitMqSettings = cfg.GetSection(nameof(RabbitMQSettings)).Get<RabbitMQSettings>();
-                rabbitMQConfigurator.Host(rabbitMqSettings?.Host);
-
                 var serviceSettings = cfg.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>();
+
+                rabbitMQConfigurator.Host(rabbitMqSettings?.Host);
                 rabbitMQConfigurator.ConfigureEndpoints(context, new KebabCaseEndpointNameFormatter(serviceSettings?.ServiceName, false));
+                rabbitMQConfigurator.UseMessageRetry(retryConfigurator =>
+                {
+                    retryConfigurator.Interval(3, TimeSpan.FromSeconds(5));
+                });
             });
         });
 
