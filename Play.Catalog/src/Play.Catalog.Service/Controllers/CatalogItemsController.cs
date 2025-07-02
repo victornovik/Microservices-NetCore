@@ -14,8 +14,10 @@ public class CatalogItemsController(IRepository<Entity> repository, IPublishEndp
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ItemDto>>> GetAsync()
     {
-        var dtos = (await repository.GetAllAsync()).Select(item => item.AsDto());
+        //var headers = HttpContext.Request.Headers;
+        //Debug.Assert(headers["User-Agent"].Equals("Play.Inventory.Service"));
 
+        var dtos = (await repository.GetAllAsync()).Select(item => item.AsDto());
         return Ok(dtos);
     }
 

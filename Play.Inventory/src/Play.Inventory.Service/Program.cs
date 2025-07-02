@@ -15,7 +15,7 @@ services
 
 services.AddRabbitMQ(); 
 
-// For synchronous REST request to Play.Catalog.Service
+// Synchronous REST request to Play.Catalog.Service
 // AddCatalogServiceClient(services);
 
 services.AddControllers();
@@ -43,10 +43,13 @@ static void AddCatalogServiceClient(IServiceCollection serviceCollection)
 {
     var jitter = new Random();
 
+    // Typed HttpClient pattern is used. Every HttpClient isntance will be created by HttpClientFactory
     serviceCollection
         .AddHttpClient<CatalogClient>(client =>
         {
             client.BaseAddress = new Uri("https://localhost:7054");
+            client.DefaultRequestHeaders.Add("Accept", "application/json");
+            client.DefaultRequestHeaders.Add("User-Agent", "Play.Inventory.Service");
         })
         .AddTransientHttpErrorPolicy(policyBuilder => policyBuilder.Or<TimeoutRejectedException>().WaitAndRetryAsync(
             retryCount: 5,

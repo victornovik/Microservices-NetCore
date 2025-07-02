@@ -16,6 +16,7 @@ public class InventoryItemsController(IRepository<InventoryEntity> repository, C
         if (userId == Guid.Empty)
             return BadRequest();
 
+        // We make a request to Play.Catalog.Service via REST
         var catalogItems = await catalogClient.GetCatalogItemsAsync();
         var inventoryItems = await repository.GetAllAsync(i => i.UserId == userId);
         var inventoryItemDtos = inventoryItems.Select(ii =>
