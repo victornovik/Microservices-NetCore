@@ -5,6 +5,8 @@ using Play.Inventory.Service.HttpClients;
 using Polly;
 using Polly.Timeout;
 
+const string AllowedOriginSettings = "AllowedOrigin";
+
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
 
@@ -29,6 +31,12 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseCors(configurePolicy =>
+    {
+        configurePolicy.WithOrigins(app.Configuration[AllowedOriginSettings]!)
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
 }
 
 app.UseHttpsRedirection();
@@ -55,12 +63,12 @@ static void AddCatalogServiceClient(IServiceCollection serviceCollection)
             retryCount: 5,
             sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))
                                                    + TimeSpan.FromMilliseconds(jitter.Next(10, 1000)),
-            onRetry: (outcome, timeSpan, retryAttempt) => Console.WriteLine($"Delaying for {timeSpan.TotalSeconds} seconds")
+            onRetry: (_, timeSpan, retryAttempt) => Console.WriteLine($"Delaying for {timeSpan.TotalSeconds} seconds")
         ))
         .AddTransientHttpErrorPolicy(policyBuilder => policyBuilder.Or<TimeoutRejectedException>().CircuitBreakerAsync(
             handledEventsAllowedBeforeBreaking:3, 
             durationOfBreak: TimeSpan.FromSeconds(10),
-            onBreak:(outcome, timeSpan) => Console.WriteLine($"Opening the circuit for {timeSpan.TotalSeconds} seconds"),
+            onBreak:(_, timeSpan) => Console.WriteLine($"Opening the circuit for {timeSpan.TotalSeconds} seconds"),
             onReset: () => Console.WriteLine("Closing the circuit")
         ))
         .AddPolicyHandler(Policy.TimeoutAsync<HttpResponseMessage>(1));
