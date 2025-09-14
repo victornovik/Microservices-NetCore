@@ -1,5 +1,7 @@
+using MassTransit;
 using Play.Common.MongoDB;
 using Play.Common.MassTransit;
+using Play.Inventory.Service.Consumers;
 using Play.Inventory.Service.Entitites;
 using Play.Inventory.Service.HttpClients;
 using Polly;
@@ -15,7 +17,19 @@ services
     .AddMongoRepository<InventoryEntity>("inventory_items")
     .AddMongoRepository<CatalogEntity>("catalog_items");
 
-services.AddRabbitMQ(); 
+services.AddRabbitMQ();
+
+// Explicit adding of RabbitMQ consumers
+//services.AddMassTransit(busConfigurator =>
+//{ 
+//    busConfigurator.AddConsumer<CatalogItemCreatedConsumer>();
+//    busConfigurator.AddConsumer<CatalogItemUpdatedConsumer>();
+//    busConfigurator.AddConsumer<CatalogItemDeletedConsumer>();
+//    busConfigurator.UsingRabbitMq((context, rabbitMQConfigurator) =>
+//    {
+//        rabbitMQConfigurator.ConfigureEndpoints(context);
+//    });
+//});
 
 // Synchronous REST request to Play.Catalog.Service
 // AddCatalogServiceClient(services);

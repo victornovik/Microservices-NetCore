@@ -10,12 +10,12 @@ public static class Extensions
 {
     public static IServiceCollection AddRabbitMQ(this IServiceCollection services)
     {
-        services.AddMassTransit(massTransitConfigurator =>
+        services.AddMassTransit(busConfigurator =>
         {
             // Register all MassTransit consumers inhereted from IConsumer<> found in the current assembly
-            massTransitConfigurator.AddConsumers(Assembly.GetEntryAssembly());
+            busConfigurator.AddConsumers(Assembly.GetEntryAssembly());
 
-            massTransitConfigurator.UsingRabbitMq((context, rabbitMQConfigurator) =>
+            busConfigurator.UsingRabbitMq((context, rabbitMQConfigurator) =>
             {
                 var cfg = context.GetService<IConfiguration>();
                 var rabbitMqSettings = cfg.GetSection(nameof(RabbitMQSettings)).Get<RabbitMQSettings>();
