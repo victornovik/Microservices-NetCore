@@ -1,6 +1,6 @@
-@Play.Inventory.Service_HostAddress = http://localhost:5155
+@Play.Inventory.Service_HostAddress = https://localhost:7055
 
-GET {{Play.Inventory.Service_HostAddress}}/weatherforecast/
+GET {{Play.Inventory.Service_HostAddress}}/items/{id}
 Accept: application/json
 
 ###
