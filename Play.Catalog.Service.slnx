@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="Play.Infra/docker-compose.yml" />
+    <File Path="Readme.md" />
+  </Folder>
+  <Project Path="Play.Catalog.Contracts/src/Play.Catalog.Contracts/Play.Catalog.Contracts.csproj" />
+  <Project Path="Play.Catalog/src/Play.Catalog.Service/Play.Catalog.Service.csproj" />
+  <Project Path="Play.Common/src/Play.Common/Play.Common.csproj" />
+  <Project Path="Play.Inventory/src/Play.Inventory.Service/Play.Inventory.Service.csproj" />
+</Solution>

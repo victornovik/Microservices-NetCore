@@ -18,11 +18,15 @@ public static class Extensions
             busConfigurator.UsingRabbitMq((context, rabbitMQConfigurator) =>
             {
                 var cfg = context.GetService<IConfiguration>();
-                var rabbitMqSettings = cfg.GetSection(nameof(RabbitMQSettings)).Get<RabbitMQSettings>();
-                var serviceSettings = cfg.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>();
+                if (cfg == null)
+                    ArgumentNullException.ThrowIfNull(cfg);
 
+                var rabbitMqSettings = cfg.GetSection(nameof(RabbitMQSettings)).Get<RabbitMQSettings>();
                 rabbitMQConfigurator.Host(rabbitMqSettings?.Host);
+
+                var serviceSettings = cfg.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>();
                 rabbitMQConfigurator.ConfigureEndpoints(context, new KebabCaseEndpointNameFormatter(serviceSettings?.ServiceName, false));
+
                 rabbitMQConfigurator.UseMessageRetry(retryConfigurator =>
                 {
                     retryConfigurator.Interval(3, TimeSpan.FromSeconds(5));

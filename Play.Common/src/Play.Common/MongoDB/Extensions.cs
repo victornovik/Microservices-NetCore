@@ -22,9 +22,17 @@ public static class Extensions
         services.AddSingleton<IMongoDatabase>(serviceProvider =>
         {
             var cfg = serviceProvider.GetService<IConfiguration>();
-            var serviceSettings = cfg.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>();
+            if (cfg == null)
+                ArgumentNullException.ThrowIfNull(cfg);
+            
             var mongoDbSettings = cfg.GetSection(nameof(MongoDbSettings)).Get<MongoDbSettings>();
+            if (mongoDbSettings == null)
+                ArgumentNullException.ThrowIfNull(mongoDbSettings);
             var mongoClient = new MongoClient(mongoDbSettings.ConnectionString);
+
+            var serviceSettings = cfg.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>();
+            if (serviceSettings == null)
+                ArgumentNullException.ThrowIfNull(serviceSettings);
             return mongoClient.GetDatabase(serviceSettings.ServiceName);
         });
         return services;
@@ -36,6 +44,9 @@ public static class Extensions
         services.AddSingleton<IRepository<T>>(serviceProvider =>
         {
             var database = serviceProvider.GetService<IMongoDatabase>();
+            if (database == null)
+                ArgumentNullException.ThrowIfNull(database);
+
             return new MongoRepository<T>(database, collectionName);
         });
         return services;
